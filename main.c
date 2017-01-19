@@ -68,6 +68,13 @@ GPIOB->AFR[0] |= 0x77000000;  // select AF7 (UART1) for PB6, PB7
 GPIOB->MODER  |= 0x0a000;  // PB6, PB7 => AF mode
 GPIOB->PUPDR  |= 0x05000;
 	
+  // initialize I2C block 
+  RCC->APB1ENR  |= 0x00400000;       // Enable clock for I2C2 
+  I2C2->CR2     |= 0x0008;           // clock == 8MHz!    
+  I2C2->CCR     |= 0x0040;           // clock control register (270kHz) 
+  I2C2->TRISE   |= 0x0009;           // rise time register 
+  I2C2->CR1     |= 0x0001;           // I2C2 enable 
+	
 };
 
 char I2C2_ReadChar (char Adr)    {   // procedure: RM0090, pg. 584! 
