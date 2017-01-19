@@ -45,7 +45,49 @@ while (1) {
 };
 
 
+void I2C2_WriteChar (char Adr, char Dat)    { 
+  I2C2->CR1         |= 0x0100;       // send START bit 
+  while (!(I2C2->SR1 & 0x0001)) {};  // wait for START condition (SB=1)  
+  I2C2->DR           = 0xd0;         // slave address   -> DR & write 
+  while (!(I2C2->SR1 & 0x0002)) {};  // wait for ADDRESS sent (ADDR=1)  
+  int Status2        = I2C2->SR2;    // read status to clear flag 
+  I2C2->DR           = Adr;          // Address in chip -> DR & write 
+  while (!(I2C2->SR1 & 0x0080)) {};  // wait for DR empty (TxE) 
+  I2C2->DR           = Dat;          // Dat -> DR & write 
+  while (!(I2C2->SR1 & 0x0080)) {};  // wait for DR empty (TxE)  
+  while (!(I2C2->SR1 & 0x0004)) {};  // wait for Byte sent (BTF) 
+  I2C2->CR1         |= 0x0200;       // send STOP bit 
+} 
 
+void I2C_init(void) {
+	
+	  ///* Initialize USART2 at 9600 baud, TX: PB6, RX: PB7 */
+  
+RCC->AHB1ENR  |= 0x02;  // Enable clock for GPIOB
+GPIOB->AFR[0] |= 0x77000000;  // select AF7 (UART1) for PB6, PB7 
+GPIOB->MODER  |= 0x0a000;  // PB6, PB7 => AF mode
+GPIOB->PUPDR  |= 0x05000;
+	
+};
+
+char I2C2_ReadChar (char Adr)    {   // procedure: RM0090, pg. 584! 
+  I2C2->CR1         |= 0x0100;       // send START bit 
+  while (!(I2C2->SR1 & 0x0001)) {};  // wait for START condition (SB=1)  
+  I2C2->DR           = 0xd0;         // slave address -> DR      (LSB=1) 
+  while (!(I2C2->SR1 & 0x0002)) {};  // wait for ADDRESS sent    (ADDR=1)  
+  int Status2        = I2C2->SR2;    // read SR2 to clear flag 
+  I2C2->DR           = Adr;          // register in chip -> DR  
+  while (!(I2C2->SR1 & 0x0080)) {};  // wait for DR empty        (TxE=1) 
+  while (!(I2C2->SR1 & 0x0004)) {};  // wait for ByteTransferred (BTF=1)  
+  I2C2->CR1         |= 0x0100;       // send START bit 
+  while (!(I2C2->SR1 & 0x0001)) {};  // wait for START condition (SB=1) 
+  I2C2->DR           = 0xd1;         // slave address -> DR      (LSB=0) 
+  while (!(I2C2->SR1 & 0x0002)) {};  // wait for ADDRESS sent    (ADDR=1) 
+  int Status4        = I2C2->SR2;    // read status to clear flag 
+  while (!(I2C2->SR1 & 0x0040)) {};  // wait for ByteReceived    (RxNE=1) 
+  I2C2->CR1         |= 0x0200;       // send STOP bit 
+  return ((char)I2C2->DR);           // return byte 
+} 
 
 
 
