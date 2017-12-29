@@ -31,8 +31,7 @@ ADC1->CR2 |= ADC_CR2_EXTSEL_1|ADC_CR2_EXTSEL_2;
 ADC1->CR1 |= ADC_CR1_EOCIE;
 ADC1->SQR3 |= ADC_SQR3_SQ1_1;
 ADC2->SQR3 |= ADC_SQR3_SQ1_1|ADC_SQR3_SQ1_0;
-//ADC2->CR2 |= ADC_CR2_CONT;
-	//ADC2->CR1 |= ADC_CR1_SCAN;
+
 
 ADC1->CR2 |= ADC_CR2_ADON;
 ADC2->CR2 |= ADC_CR2_ADON;
@@ -58,9 +57,7 @@ LCD_clear();
 	
 	
 while (1) {
-//sprintf(buffer1, "%u", a);
 
-//LCD_Text(1,buffer1);
 	
 };
 	
@@ -69,8 +66,7 @@ while (1) {
 
 
 void ADC_IRQHandler(void)
-{ // if UIF flag is set
-
+{ 
 //GPIOE->ODR |= 0x0100; // PE08 up
 Ptr = (Ptr + 1) & 1023; // Increment pointer and limit its value
 Result[Ptr] = ADC1->DR; // save ADC in circular buffer & clear EOC flag
@@ -78,7 +74,7 @@ a=Result[Ptr];
 DAC->DHR12R1 = Result[Ptr]; // pass current buffer -> DAC
 DAC->DHR12R2 = Result[(Ptr - 100) & 1023]; // pass past buffer -> DAC
 
-//GPIOE->ODR &= ~0x0100; // PE08 down
+
 ;
 };
 
@@ -102,11 +98,7 @@ uint8_t tmp;
 
 /*
 
-RCC->APB1ENR  |= RCC_APB1ENR_TIM7EN;  // Enable clock for TIM7
-//TIM7->PSC = 1;
-//TIM7->ARR =20000;
-//TIM7->DIER |=0x01;
-//TIM7->CR1 |= 0x05;
+
 
 
 
